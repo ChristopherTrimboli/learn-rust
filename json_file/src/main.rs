@@ -17,6 +17,13 @@ fn write_json(json: Json) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn read_json(file_path: &str) -> Result<Json, Box<dyn Error>> {
+    let file = File::open(file_path)?;
+    let reader = BufReader::new(file);
+    let json = serde_json::from_reader(reader)?;
+    Ok(json)
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let file_exists = Path::new(JSON_PATH)
         .try_exists()
@@ -26,10 +33,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             message: "I love the world".to_string(),
         };
         write_json(new_json)?;
-        let file = File::open(JSON_PATH)?;
-        let reader = BufReader::new(file);
-        let json: Json = serde_json::from_reader(reader)?;
-        println!("{:?}", json.message);
+        let json_read = read_json(JSON_PATH)?;
+        println!("{:?}", json_read.message);
         Ok(())
     } else {
         println!("File does not exist");
